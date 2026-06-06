@@ -104,7 +104,7 @@ const Hero = () => {
                 href="#demo"
                 className="w-full sm:max-w-none flex items-center justify-center gap-2 bg-surface-950/90 backdrop-blur-sm text-white font-semibold text-base px-6 py-3 rounded-xl hover:bg-surface-900/80 transition-all"
               >
-                Explorar Funcionalidades
+                Ver Funcionalidades
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

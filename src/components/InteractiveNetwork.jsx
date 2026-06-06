@@ -7,9 +7,20 @@ const painPoints = [
   "Pérdida de Tiempo",
   "Clientes Molestos",
   "Excel Desactualizado",
-  "Suscripciones Vencidas",
+  "Mensualidades Vencidas",
   "Control Manual",
-  "Falta de Métricas"
+  "Falta de Métricas",
+  "Pagos Atrasados",
+  "Suscripciones Canceladas",
+  "Retención Baja",
+  "Inventario Perdido",
+  "Descontrol de Rutinas",
+  "Gestión de Entrenadores",
+  "Ventas Estancadas",
+  "Usuarios Inactivos",
+  "WhatsApp Colapsado",
+  "Gastos Ocultos",
+  "Falta de Seguimiento"
 ];
 
 const InteractiveNetwork = () => {
@@ -53,13 +64,20 @@ const InteractiveNetwork = () => {
     };
 
     class Particle {
-      constructor(isPainPoint = false, sector = null) {
+      constructor(isPainPoint = false, isHunter = false) {
         this.isPainPoint = isPainPoint;
-        this.sector = sector;
-        this.label = isPainPoint ? getRandomPainPointText() : "";
+        this.isHunter = isHunter;
+        this.label = isHunter ? "MultiGymCR" : (isPainPoint ? getRandomPainPointText() : "");
         
-        if (isPainPoint) {
-          this.spawnFromSafeZone();
+        if (isHunter) {
+          this.x = width / 2;
+          this.y = height / 2;
+          this.baseVx = (Math.random() - 0.5) * 2;
+          this.baseVy = (Math.random() - 0.5) * 2;
+          this.vx = this.baseVx;
+          this.vy = this.baseVy;
+        } else if (isPainPoint) {
+          this.spawnFromEdges();
         } else {
           this.x = Math.random() * width;
           this.y = Math.random() * height;
@@ -69,12 +87,12 @@ const InteractiveNetwork = () => {
           this.vy = this.baseVy;
         }
 
-        this.radius = isPainPoint ? Math.random() * 2 + 4 : Math.random() * 1.5 + 0.5;
-        this.color = isPainPoint ? '#f43f5e' : '#6366f1'; 
-        this.glow = isPainPoint ? '#fb7185' : 'transparent';
+        this.radius = isHunter ? 8 : (isPainPoint ? Math.random() * 2 + 4 : Math.random() * 1.5 + 0.5);
+        this.color = isHunter ? '#10b981' : (isPainPoint ? '#f43f5e' : '#6366f1'); 
+        this.glow = isHunter ? '#34d399' : (isPainPoint ? '#fb7185' : 'transparent');
         
         // Animación de aparición gradual
-        this.opacity = isPainPoint ? 0 : 1;
+        this.opacity = (isPainPoint || isHunter) ? 0 : 1;
         this.targetOpacity = 1;
         this.spawnDelay = isPainPoint ? Math.random() * 4000 : 0; 
         this.createdAt = Date.now();
@@ -91,7 +109,8 @@ const InteractiveNetwork = () => {
         this.isPainPoint = false;
         this.opacity = 0;
         activeTexts.delete(this.label);
-        this.respawnTime = Date.now() + 1500 + Math.random() * 2000;
+        // Aumentar drásticamente el tiempo para que no saturen la pantalla
+        this.respawnTime = Date.now() + 6000 + Math.random() * 6000;
         
         // Crear 12 bolitas pequeñas de escombros
         for (let i = 0; i < 12; i++) {
@@ -111,46 +130,40 @@ const InteractiveNetwork = () => {
         }
       }
 
-      spawnFromSafeZone() {
-        // En lugar de nacer exactamente en el centro (detrás del texto), 
-        // nacen en los bordes de la zona segura central
-        const safeMarginX = width < 768 ? 140 : 280;
-        const safeMarginY = width < 768 ? 120 : 180;
-        const centerY = height / 2 - (width < 768 ? 50 : 80);
-        
-        let speedX = Math.random() * 1.5 + 0.5;
-        let speedY = Math.random() * 1.5 + 0.5;
-        
-        // Posicionar y direccionar según sector
-        if (this.sector === 'left') {
-            this.x = width / 2 - safeMarginX;
-            this.y = centerY + (Math.random() - 0.5) * 100;
-            this.baseVx = -speedX;
-            this.baseVy = (Math.random() - 0.5) * 1.5;
-        } else if (this.sector === 'right') {
-            this.x = width / 2 + safeMarginX;
-            this.y = centerY + (Math.random() - 0.5) * 100;
-            this.baseVx = speedX;
-            this.baseVy = (Math.random() - 0.5) * 1.5;
-        } else if (this.sector === 'top') {
-            this.x = width / 2 + (Math.random() - 0.5) * 100;
-            this.y = centerY - safeMarginY;
-            this.baseVx = (Math.random() - 0.5) * 1.5;
-            this.baseVy = -speedY;
-        } else if (this.sector === 'bottom') {
-            this.x = width / 2 + (Math.random() - 0.5) * 100;
-            this.y = centerY + safeMarginY;
-            this.baseVx = (Math.random() - 0.5) * 1.5;
-            this.baseVy = speedY;
-        } else {
-            this.x = width / 2;
-            this.y = height / 2;
-            this.baseVx = (Math.random() - 0.5) * 1.5;
-            this.baseVy = (Math.random() - 0.5) * 1.5;
-        }
-        
-        this.vx = this.baseVx;
-        this.vy = this.baseVy;
+      spawnFromEdges() {
+         // Spawnea en las esquinas de la pantalla para evitar estorbar arriba/abajo en móvil
+         const corner = Math.floor(Math.random() * 4); // 0: TL, 1: TR, 2: BR, 3: BL
+         const centerX = width / 2;
+         const centerY = height / 2;
+         
+         const isMobile = width < 768;
+         const marginX = isMobile ? 20 : 60;
+         const marginY = isMobile ? 20 : 60;
+
+         if (corner === 0) { // Top-Left
+             this.x = marginX;
+             this.y = marginY;
+         } else if (corner === 1) { // Top-Right
+             this.x = width - marginX;
+             this.y = marginY;
+         } else if (corner === 2) { // Bottom-Right
+             this.x = width - marginX;
+             this.y = height - marginY;
+         } else { // Bottom-Left
+             this.x = marginX;
+             this.y = height - marginY;
+         }
+         
+         // Direccionarla suavemente hacia el centro, con ligera variación para que no sea un láser perfecto
+         let dx = (centerX + (Math.random() - 0.5) * 100) - this.x;
+         let dy = (centerY + (Math.random() - 0.5) * 100) - this.y;
+         let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+         
+         const speed = Math.random() * 0.4 + 0.2; // Lento para que no sature
+         this.baseVx = (dx / dist) * speed;
+         this.baseVy = (dy / dist) * speed;
+         this.vx = this.baseVx;
+         this.vy = this.baseVy;
       }
 
       draw() {
@@ -159,16 +172,16 @@ const InteractiveNetwork = () => {
         ctx.globalAlpha = this.opacity;
         
         // Efecto "Glow" optimizado para alto rendimiento (sin usar shadowBlur)
-        if (this.isPainPoint) {
-          // Glow exterior
+        if (this.isPainPoint || this.isHunter) {
+          // Glow exterior más suave y grande
           ctx.beginPath();
-          ctx.arc(this.x, this.y, this.radius * 3.5, 0, Math.PI * 2);
+          ctx.arc(this.x, this.y, this.radius * (this.isHunter ? 3 : 4), 0, Math.PI * 2);
           ctx.fillStyle = this.glow + '30'; // 20% opacity approx en hex
           ctx.fill();
           
           // Glow interior
           ctx.beginPath();
-          ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+          ctx.arc(this.x, this.y, this.radius * (this.isHunter ? 1.5 : 2), 0, Math.PI * 2);
           ctx.fillStyle = this.glow + '60'; // 40% opacity approx en hex
           ctx.fill();
         }
@@ -179,11 +192,17 @@ const InteractiveNetwork = () => {
         ctx.fillStyle = this.color;
         ctx.fill();
         
-        // Dibujar etiqueta si es un punto de dolor
-        if (this.isPainPoint && this.label) {
-          ctx.font = "bold 13px Inter, sans-serif";
-          ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        // Dibujar etiqueta si es un punto de dolor o hunter
+        if ((this.isPainPoint || this.isHunter) && this.label) {
+          ctx.font = this.isHunter ? "bold 13px Inter, sans-serif" : "bold 11px Inter, sans-serif";
+          ctx.fillStyle = this.isHunter ? "#34d399" : "rgba(255, 255, 255, 0.9)";
+          if (this.isHunter) {
+            // Un poco de sombra al texto del hunter para que resalte más
+            ctx.shadowColor = "#000000";
+            ctx.shadowBlur = 4;
+          }
           ctx.fillText(this.label, this.x + 12, this.y + 5);
+          ctx.shadowBlur = 0;
         }
         ctx.restore();
       }
@@ -194,7 +213,7 @@ const InteractiveNetwork = () => {
           this.isSleeping = false;
           this.isPainPoint = true;
           this.label = getRandomPainPointText();
-          this.spawnFromSafeZone(); // Nace desde los bordes de la zona segura
+          this.spawnFromEdges(); // Nace desde los bordes de la pantalla
           
           this.color = '#f43f5e';
           this.glow = '#fb7185';
@@ -254,25 +273,59 @@ const InteractiveNetwork = () => {
             this.vx -= (dxCenter / distCenter) * repulsion * 2;
             this.vy -= (dyCenter / distCenter) * repulsion * 2;
           }
-          
-          // Atracción magnética hacia el centro de su propio territorio para evitar aglomeración central
-          let targetX = this.x;
-          let targetY = this.y;
-          
-          if (this.sector === 'left') targetX = width * 0.15;
-          else if (this.sector === 'right') targetX = width * 0.85;
-          else if (this.sector === 'top') targetY = height * 0.15;
-          else if (this.sector === 'bottom') targetY = height * 0.85;
-
-          if (this.sector) {
-            this.vx += (targetX - this.x) * 0.0008;
-            this.vy += (targetY - this.y) * 0.0008;
-          }
         }
         
-        // Fricción y movimiento errático (Browniano) para que no se queden quietas
-        if (!this.isDebris) {
-          // Fluctuación constante de la velocidad base para simular gravedad fluida
+        // Lógica de "Hunter" (Misil guiado hacia los puntos de dolor)
+        if (this.isHunter) {
+           let nearest = null;
+           let minDist = Infinity;
+           for(let p of particles) {
+               if (p.isPainPoint && p.opacity > 0) {
+                   let dx = p.x - this.x;
+                   let dy = p.y - this.y;
+                   let dist = Math.sqrt(dx*dx + dy*dy);
+                   if (dist < minDist) {
+                       minDist = dist;
+                       nearest = p;
+                   }
+               }
+           }
+           
+           if (nearest) {
+               // Acelerar hacia el objetivo (misil guiado lento y constante)
+               let dx = nearest.x - this.x;
+               let dy = nearest.y - this.y;
+               let dist = Math.sqrt(dx*dx + dy*dy);
+               this.vx += (dx / dist) * 0.1;
+               this.vy += (dy / dist) * 0.1;
+               
+               // Límite de velocidad del cazador (drásticamente reducido)
+               const maxSpeed = 1.8;
+               const currentSpeed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+               if (currentSpeed > maxSpeed) {
+                  this.vx = (this.vx / currentSpeed) * maxSpeed;
+                  this.vy = (this.vy / currentSpeed) * maxSpeed;
+               }
+
+               // Colisión / Destrucción!
+               if (minDist < this.radius + nearest.radius + 15) {
+                   nearest.shatter(particles);
+                   // El cazador rebota de felicidad suavemente
+                   this.vx *= -0.3;
+                   this.vy *= -0.3;
+               }
+           } else {
+               // Patrullar suavemente si no hay dolor
+               this.vx = this.vx * 0.98 + (Math.random() - 0.5) * 0.2;
+               this.vy = this.vy * 0.98 + (Math.random() - 0.5) * 0.2;
+               const currentSpeed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+               if (currentSpeed > 1.0) {
+                  this.vx = (this.vx / currentSpeed) * 1.0;
+                  this.vy = (this.vy / currentSpeed) * 1.0;
+               }
+           }
+        } else if (!this.isDebris) {
+          // Fluctuación constante de la velocidad base para simular gravedad fluida (Solo no-hunters)
           if (this.isPainPoint) {
             this.baseVx += (Math.random() - 0.5) * 0.15;
             this.baseVy += (Math.random() - 0.5) * 0.15;
@@ -330,17 +383,14 @@ const InteractiveNetwork = () => {
         particles.push(new Particle(false));
       }
       
-      // Puntos de dolor (limitados y separados por sectores)
+      // Puntos de dolor (nacen desde los bordes sin sector estricto)
       const numPainPoints = isMobile ? 4 : 6;
       for (let i = 0; i < numPainPoints; i++) {
-         let sector;
-         if (isMobile) {
-            sector = i % 2 === 0 ? 'top' : 'bottom';
-         } else {
-            sector = i % 2 === 0 ? 'left' : 'right';
-         }
-         particles.push(new Particle(true, sector));
+         particles.push(new Particle(true));
       }
+      
+      // El Cazador (MultiGym)
+      particles.push(new Particle(false, true));
     };
 
     const animate = () => {
@@ -349,12 +399,17 @@ const InteractiveNetwork = () => {
       // Limpiar basura (debris muertos)
       particles = particles.filter(p => !p.dead);
 
-      // Dibujar líneas
+      // Dibujar líneas y procesar colisiones
       for (let i = 0; i < particles.length; i++) {
-        for (let j = i; j < particles.length; j++) {
+        for (let j = i + 1; j < particles.length; j++) { // Optimización 1: j = i + 1 (evita duplicados y auto-chequeos)
           let dx = particles[i].x - particles[j].x;
           let dy = particles[i].y - particles[j].y;
-          let distance = Math.sqrt(dx * dx + dy * dy);
+          let distSq = dx * dx + dy * dy;
+          
+          // Optimización 2: Saltarse el costoso Math.sqrt si las partículas están muy lejos (> 160px)
+          if (distSq > 25600) continue; 
+          
+          let distance = Math.sqrt(distSq);
           
           // Colisión y Repulsión Fuerte entre dos Puntos de Dolor para evitar apelotonamiento
           if (i !== j && particles[i].isPainPoint && particles[j].isPainPoint) {
