@@ -84,9 +84,35 @@ const InteractiveNetwork = () => {
         this.createdAt = Date.now();
         
         // Lógica de destrucción
-        this.isDismissed = false;
         this.isSleeping = false;
         this.respawnTime = 0;
+        this.isDebris = false;
+        this.dead = false;
+      }
+
+      shatter(particlesArray) {
+        this.isSleeping = true;
+        this.isPainPoint = false;
+        this.opacity = 0;
+        activeTexts.delete(this.label);
+        this.respawnTime = Date.now() + 1500 + Math.random() * 2000;
+        
+        // Crear 12 bolitas pequeñas de escombros
+        for (let i = 0; i < 12; i++) {
+          const debris = new Particle(false);
+          debris.x = this.x + (Math.random() - 0.5) * 10;
+          debris.y = this.y + (Math.random() - 0.5) * 10;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 10 + 5;
+          debris.vx = Math.cos(angle) * speed;
+          debris.vy = Math.sin(angle) * speed;
+          debris.color = this.color;
+          debris.glow = this.glow;
+          debris.radius = Math.random() * 2 + 1;
+          debris.opacity = 1;
+          debris.isDebris = true;
+          particlesArray.push(debris);
+        }
       }
 
       spawnFromSafeZone() {
@@ -191,36 +217,34 @@ const InteractiveNetwork = () => {
           }
         }
 
-        // Interacción con mouse/dedo
-        if (mouse.x != null && mouse.y != null && !this.isDismissed && this.opacity > 0) {
+        if (this.isDebris) {
+          this.opacity -= 0.03; // Desvanecer rápido
+          if (this.opacity <= 0) {
+             this.dead = true;
+          }
+        }
+
+        // Interacción con mouse/dedo (Repulsión)
+        if (mouse.x != null && mouse.y != null && this.opacity > 0 && !this.isDebris) {
           let dx = mouse.x - this.x;
           let dy = mouse.y - this.y;
           let distance = Math.sqrt(dx * dx + dy * dy);
           
           if (distance < mouse.radius) {
-            // Touch to destroy (Si es un dolor y se toca muy de cerca)
-            if (this.isPainPoint && distance < 60) {
-              this.isDismissed = true;
-              // Salir disparado hacia afuera con velocidad moderada (no tan rápido)
-              this.vx = (dx > 0 ? -12 : 12) + (Math.random() * 4 - 2);
-              this.vy = (dy > 0 ? -12 : 12) + (Math.random() * 4 - 2);
-            } else {
-              // Acelerar si es tocado/movido cerca (Repulsión normal)
-              const forceDirectionX = dx / distance;
-              const forceDirectionY = dy / distance;
-              const force = (mouse.radius - distance) / mouse.radius; // 0 to 1
-              const directionX = forceDirectionX * force * 5;
-              const directionY = forceDirectionY * force * 5;
-              
-              // Efecto de empuje centrífugo
-              this.vx -= directionX;
-              this.vy -= directionY;
-            }
+            // Acelerar si es tocado/movido cerca (Repulsión centrífuga suave)
+            const forceDirectionX = dx / distance;
+            const forceDirectionY = dy / distance;
+            const force = (mouse.radius - distance) / mouse.radius; 
+            const directionX = forceDirectionX * force * 5;
+            const directionY = forceDirectionY * force * 5;
+            
+            this.vx -= directionX;
+            this.vy -= directionY;
           }
         }
         
         // Zona de Exclusión Central y Fuerza de Retención de Sector
-        if (this.isPainPoint && !this.isDismissed) {
+        if (this.isPainPoint && !this.isDebris) {
           const centerX = width / 2;
           const centerY = height / 2 - (width < 768 ? 50 : 80); 
           const dxCenter = centerX - this.x;
@@ -251,7 +275,7 @@ const InteractiveNetwork = () => {
         }
         
         // Fricción y movimiento errático (Browniano) para que no se queden quietas
-        if (!this.isDismissed) {
+        if (!this.isDebris) {
           // Fluctuación constante de la velocidad base para simular gravedad fluida
           if (this.isPainPoint) {
             this.baseVx += (Math.random() - 0.5) * 0.15;
@@ -265,9 +289,10 @@ const InteractiveNetwork = () => {
           this.vx = this.vx * 0.98 + this.baseVx * 0.02;
           this.vy = this.vy * 0.98 + this.baseVy * 0.02;
           
-          // Añadir gravedad del Giroscopio (Holograma 3D)
-          this.vx += tiltX * 0.3;
-          this.vy += tiltY * 0.3;
+          // Añadir gravedad del Giroscopio más sutil y con variación de "peso"
+          // Cada partícula reacciona ligeramente diferente para no moverse en bloque
+          this.vx += tiltX * (0.06 + (this.radius * 0.005));
+          this.vy += tiltY * (0.06 + (this.radius * 0.005));
         }
 
         this.x += this.vx;
@@ -293,28 +318,10 @@ const InteractiveNetwork = () => {
           this.y = 0;
           this.vy = Math.abs(this.vy);
           this.baseVy = Math.abs(this.baseVy);
-          hitEdge = true;
         } else if (this.y > height) {
           this.y = height;
           this.vy = -Math.abs(this.vy);
           this.baseVy = -Math.abs(this.baseVy);
-          hitEdge = true;
-        }
-
-        // Si fue disparado y choca con el borde, se convierte en un punto simple
-        if (this.isDismissed && hitEdge) {
-          this.isDismissed = false;
-          this.isSleeping = true; 
-          this.isPainPoint = false; 
-          this.color = '#6366f1';
-          this.glow = 'transparent';
-          this.radius = Math.random() * 1.5 + 0.5;
-          this.opacity = 1; 
-          
-          // Liberar el texto para que pueda ser usado por otro
-          activeTexts.delete(this.label);
-          
-          this.respawnTime = Date.now() + 3000 + Math.random() * 3000;
         }
         
         this.draw();
@@ -348,6 +355,9 @@ const InteractiveNetwork = () => {
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
       
+      // Limpiar basura (debris muertos)
+      particles = particles.filter(p => !p.dead);
+
       // Dibujar líneas
       for (let i = 0; i < particles.length; i++) {
         for (let j = i; j < particles.length; j++) {
@@ -355,11 +365,12 @@ const InteractiveNetwork = () => {
           let dy = particles[i].y - particles[j].y;
           let distance = Math.sqrt(dx * dx + dy * dy);
           
-          // Colisión y Repulsión entre dos Puntos de Dolor para evitar textos encimados
+          // Colisión y Repulsión Fuerte entre dos Puntos de Dolor para evitar apelotonamiento
           if (i !== j && particles[i].isPainPoint && particles[j].isPainPoint) {
-            const minDistance = 150; // Distancia mínima segura para que los textos no choquen
+            const minDistance = 160; // Distancia mínima segura
             if (distance < minDistance && distance > 0) {
-              const pushForce = (minDistance - distance) / minDistance * 0.2;
+              // Fuerza repulsiva muy alta (0.8) para evitar que el giroscopio los junte
+              const pushForce = (minDistance - distance) / minDistance * 0.8;
               const pushX = (dx / distance) * pushForce;
               const pushY = (dy / distance) * pushForce;
               
@@ -438,12 +449,39 @@ const InteractiveNetwork = () => {
       mouse.radius = 100;
     };
 
+    const handleCanvasClick = (e) => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0;
+      const clickY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || 0;
+      
+      const x = clickX - rect.left;
+      const y = clickY - rect.top;
+      
+      // Encontrar si tocó algún punto de dolor
+      for (let p of particles) {
+        if (p.isPainPoint && p.opacity > 0) {
+          let dx = x - p.x;
+          let dy = y - p.y;
+          // Hitbox generoso (35px) para que sea fácil tocarlo en móviles
+          if (Math.sqrt(dx * dx + dy * dy) < p.radius + 35) {
+            p.shatter(particles);
+            break; // Destruir solo uno por tap
+          }
+        }
+      }
+    };
+
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd);
     window.addEventListener('deviceorientation', handleOrientation);
+    if (canvas) {
+      canvas.addEventListener('click', handleCanvasClick);
+      canvas.addEventListener('touchstart', handleCanvasClick, { passive: true });
+    }
     
     resize();
     animate();
@@ -455,6 +493,10 @@ const InteractiveNetwork = () => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('deviceorientation', handleOrientation);
+      if (canvas) {
+        canvas.removeEventListener('click', handleCanvasClick);
+        canvas.removeEventListener('touchstart', handleCanvasClick);
+      }
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
