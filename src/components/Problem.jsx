@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { CurrencyDollarIcon, ClockIcon, ShieldExclamationIcon } from '@heroicons/react/24/outline';
 
@@ -6,21 +6,35 @@ const problems = [
   {
     icon: CurrencyDollarIcon,
     title: "Fugas de Ingresos",
-    description: "Cada mes pierde clientes y dinero porque las membresías vencidas siguen entrando sin pagar."
+    description: "Cada mes pierde clientes y dinero porque las membresías vencidas siguen entrando sin pagar.",
+    color: "red",
+    iconBg: "from-red-500/20 to-red-600/20",
+    iconColor: "text-red-400",
+    borderHover: "hover:border-red-500/30",
+    glowColor: "group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]",
   },
   {
     icon: ClockIcon,
     title: "Tiempo Perdido",
-    description: "Horas valiosas gastadas revisando hojas de cálculo en lugar de hacer crecer el negocio."
+    description: "Horas valiosas gastadas revisando hojas de cálculo en lugar de hacer crecer el negocio.",
+    color: "amber",
+    iconBg: "from-amber-500/20 to-amber-600/20",
+    iconColor: "text-amber-400",
+    borderHover: "hover:border-amber-500/30",
+    glowColor: "group-hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
   },
   {
     icon: ShieldExclamationIcon,
     title: "Acceso Inseguro",
-    description: "Personal distraído actuando como guardia, en vez de atender y vender."
+    description: "Personal distraído actuando como guardia, en vez de atender y vender.",
+    color: "orange",
+    iconBg: "from-orange-500/20 to-orange-600/20",
+    iconColor: "text-orange-400",
+    borderHover: "hover:border-orange-500/30",
+    glowColor: "group-hover:shadow-[0_0_30px_rgba(249,115,22,0.15)]",
   }
 ];
 
-// Variantes para animación en cascada
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -35,66 +49,125 @@ const cardVariants = {
 };
 
 const Problem = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <section id="problema" className="bg-white py-16 sm:py-20 md:py-28">
-      <div className="container mx-auto px-4 sm:px-6">
+    <section id="problema" className="relative section-padding overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-surface-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-surface-950 via-surface-900/45 to-surface-950" />
+      <div 
+        className="absolute inset-0 bg-dots opacity-20 pointer-events-none" 
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+          maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+        }}
+      />
+
+      <div className="section-container relative z-10">
 
         {/* Encabezado */}
         <div className="text-center max-w-3xl mx-auto">
           <motion.h2
-            className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight"
+            className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5 }}
           >
             ¿Le suena familiar?
-            <span className="block mt-2 bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="block mt-2 text-gradient pb-2">
               Los 3 problemas que frenan su gimnasio
             </span>
           </motion.h2>
 
           <motion.p
-            className="mt-4 text-lg text-gray-600 max-w-xl mx-auto"
+            className="mt-5 text-lg text-surface-400 max-w-xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            La administración manual es el enemigo silencioso de sus ganancias.  
+            La administración manual es el enemigo silencioso de sus ganancias.
             Nuestro sistema los elimina de raíz.
           </motion.p>
         </div>
 
         {/* Tarjetas */}
-        <motion.div
-          className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.2 }}
-        >
-          {problems.map((problem, index) => {
-            const Icon = problem.icon;
-            return (
-              <motion.div
-                key={index}
-                variants={cardVariants}
-                className="text-center p-8 bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl hover:scale-[1.03] hover:border-indigo-300 transition-all duration-300"
-              >
-                <div className="mx-auto bg-gradient-to-tr from-indigo-500 to-pink-500 text-white rounded-full h-16 w-16 flex items-center justify-center shadow-lg">
-                  <Icon className="h-8 w-8" />
-                </div>
-                <h3 className="mt-6 text-xl font-bold text-gray-900">
-                  {problem.title}
-                </h3>
-                <p className="mt-3 text-gray-600 max-w-xs mx-auto">
-                  {problem.description}
-                </p>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+        {isMobile ? (
+          /* Vista Móvil: Marquee Continuo Infinito (Estilo SocialProof) */
+          <div 
+            className="mt-12 overflow-hidden relative w-full py-4"
+            style={{
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+              maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+            }}
+          >
+
+            <div 
+              className="flex gap-5 w-max animate-marquee"
+              style={{ animationDuration: '22s' }}
+            >
+              {[...problems, ...problems].map((problem, idx) => {
+                const Icon = problem.icon;
+                return (
+                  <div
+                    className="group text-center p-6 bg-surface-900/90 backdrop-blur-md border border-surface-800/80 rounded-3xl w-[280px] flex-shrink-0 cursor-default hover:bg-surface-900 transition-colors"
+                  >
+                    <div className={`mx-auto bg-gradient-to-br ${problem.iconBg} ${problem.iconColor} rounded-2xl h-14 w-14 flex items-center justify-center ring-1 ring-white/5`}>
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <h3 className="mt-5 text-lg font-bold text-white">
+                      {problem.title}
+                    </h3>
+                    <p className="mt-3 text-sm text-surface-400 max-w-xs mx-auto leading-relaxed">
+                      {problem.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* Vista Desktop: Grilla Estática con Animación */
+          <motion.div
+            className="mt-16 grid grid-cols-3 gap-6 md:gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {problems.map((problem, index) => {
+              const Icon = problem.icon;
+              return (
+                <motion.div
+                  key={index}
+                  variants={cardVariants}
+                  className={`group text-center p-8 bg-surface-900/90 backdrop-blur-md border border-surface-800/80 rounded-3xl ${problem.borderHover} ${problem.glowColor} transition-all duration-500 cursor-default hover:bg-surface-900 transform-gpu will-change-transform`}
+                >
+                  <div className={`mx-auto bg-gradient-to-br ${problem.iconBg} ${problem.iconColor} rounded-2xl h-16 w-16 flex items-center justify-center ring-1 ring-white/5`}>
+                    <Icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="mt-6 text-xl font-bold text-white">
+                    {problem.title}
+                  </h3>
+                  <p className="mt-3 text-surface-400 max-w-xs mx-auto leading-relaxed">
+                    {problem.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
       </div>
     </section>
   );

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
-// Array de preguntas y respuestas actualizado
 const faqs = [
   {
     question: "¿La instalación y el equipo tienen un costo adicional?",
@@ -30,8 +29,19 @@ const FAQ = () => {
   };
 
   return (
-    <section id="faq" className="py-16 sm:py-20 bg-white">
-      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+    <section id="faq" className="relative section-padding overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-surface-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-surface-950 via-surface-900/30 to-surface-950 pointer-events-none" />
+      <div 
+        className="absolute inset-0 bg-dots opacity-15 pointer-events-none" 
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+          maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+        }}
+      />
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -39,32 +49,35 @@ const FAQ = () => {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
             Preguntas Frecuentes
           </h2>
-          <p className="mt-4 text-lg text-gray-600">
+          <p className="mt-4 text-lg text-surface-400">
             Resolvemos tus dudas más comunes de forma clara y directa.
           </p>
         </motion.div>
 
-        <div className="mt-10 space-y-4">
+        <div className="mt-12 space-y-4">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="border border-gray-200 rounded-lg overflow-hidden"
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              className={`glass-card rounded-xl overflow-hidden transition-colors duration-300 transform-gpu will-change-transform ${
+                activeIndex === index ? 'border-brand-500/30' : ''
+              }`}
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center text-left p-5 font-semibold text-gray-800 bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="w-full flex justify-between items-center text-left p-5 sm:p-6 font-semibold text-white hover:bg-white/[0.02] transition-colors"
               >
-                <span>{faq.question}</span>
+                <span className="text-[15px] sm:text-base pr-4">{faq.question}</span>
                 <motion.div
                   animate={{ rotate: activeIndex === index ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
+                  className={`flex-shrink-0 ${activeIndex === index ? 'text-brand-400' : 'text-surface-500'}`}
                 >
                   <ChevronDown className="w-5 h-5" />
                 </motion.div>
@@ -78,8 +91,11 @@ const FAQ = () => {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="p-5 text-gray-600 bg-white">
-                      {faq.answer}
+                    <div className="pb-1">
+                      <div className="mx-5 sm:mx-6 h-px bg-gradient-to-r from-transparent via-brand-500/30 to-transparent" />
+                      <div className="p-5 sm:p-6 pt-4 text-surface-400 leading-relaxed text-[15px]">
+                        {faq.answer}
+                      </div>
                     </div>
                   </motion.div>
                 )}
