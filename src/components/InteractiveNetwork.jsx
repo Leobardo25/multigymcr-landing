@@ -36,10 +36,6 @@ const InteractiveNetwork = () => {
     };
     // Configuración interactiva
     let mouse = { x: null, y: null, radius: 100 };
-    
-    // Configuración de Giroscopio (Holograma 3D)
-    let tiltX = 0;
-    let tiltY = 0;
 
     const resize = () => {
       // Usar el tamaño de la ventana pero tener en cuenta el DPR para dispositivos móviles
@@ -288,11 +284,6 @@ const InteractiveNetwork = () => {
 
           this.vx = this.vx * 0.98 + this.baseVx * 0.02;
           this.vy = this.vy * 0.98 + this.baseVy * 0.02;
-          
-          // Añadir gravedad del Giroscopio más sutil y con variación de "peso"
-          // Cada partícula reacciona ligeramente diferente para no moverse en bloque
-          this.vx += tiltX * (0.06 + (this.radius * 0.005));
-          this.vy += tiltY * (0.06 + (this.radius * 0.005));
         }
 
         this.x += this.vx;
@@ -411,20 +402,6 @@ const InteractiveNetwork = () => {
     };
 
     // Eventos
-    const handleOrientation = (e) => {
-      // gamma: rotación izquierda-derecha ([-90, 90])
-      // beta: inclinación adelante-atrás ([-180, 180])
-      if (e.gamma !== null && e.beta !== null) {
-        // Limitar los valores para que el efecto no sea descontrolado
-        const clampedGamma = Math.max(-45, Math.min(45, e.gamma));
-        const clampedBeta = Math.max(-45, Math.min(45, e.beta - 40)); // Se asume que el usuario sostiene el cel a 40 grados
-        
-        // Normalizar a una fuerza entre -1 y 1
-        tiltX = clampedGamma / 45;
-        tiltY = clampedBeta / 45;
-      }
-    };
-
     const handleMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
@@ -477,7 +454,6 @@ const InteractiveNetwork = () => {
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd);
-    window.addEventListener('deviceorientation', handleOrientation);
     if (canvas) {
       canvas.addEventListener('click', handleCanvasClick);
       canvas.addEventListener('touchstart', handleCanvasClick, { passive: true });
@@ -492,7 +468,6 @@ const InteractiveNetwork = () => {
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('deviceorientation', handleOrientation);
       if (canvas) {
         canvas.removeEventListener('click', handleCanvasClick);
         canvas.removeEventListener('touchstart', handleCanvasClick);
