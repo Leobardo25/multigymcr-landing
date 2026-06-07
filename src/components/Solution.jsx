@@ -6,7 +6,7 @@ const benefits = [
   {
     icon: ShieldCheck,
     title: "Control de Acceso & Seguridad",
-    description: "Asegure el 100% de sus ingresos. Bloqueo instantáneo de membresías vencidas: si no está al día, la puerta del gimnasio simplemente no abre.",
+    description: "Asegure el 100% de sus ingresos con bloqueo automático. Al instalar una cerradura electromagnética, la puerta no abre si hay morosidad. Compatible con biométricos (huella, facial) o nuestros métodos incluidos: Escáner QR y Carné Inteligente.",
     points: [
       "Acceso seguro por código QR",
       "Registro de entradas en tiempo real",
@@ -19,7 +19,7 @@ const benefits = [
   {
     icon: BarChart3,
     title: "Gestión Administrativa y Financiera",
-    description: "Vea la salud de su negocio en segundos. Olvídese de Excel con reportes de asistencia claros, facturación rápida y cobros automáticos.",
+    description: "Vea la salud de su negocio en segundos. Olvídese de Excel con reportes claros, facturación rápida y gestión ágil de pagos por SINPE. (La integración de pasarelas para cobro automático con tarjeta se cotiza a la medida).",
     points: [
       "Facturación automática y POS",
       "Reportes de ingresos en vivo",

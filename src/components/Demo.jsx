@@ -5,7 +5,11 @@ import {
   Pause,
   Volume2, 
   VolumeX, 
-  CheckCircle2
+  CheckCircle2,
+  FastForward,
+  Rewind,
+  Maximize,
+  Minimize
 } from 'lucide-react';
 import { ThumbnailCard, modulesData } from './ThumbnailCard';
 
@@ -14,8 +18,18 @@ const Demo = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControlsMobile, setShowControlsMobile] = useState(false);
+  const [isFastForwarding, setIsFastForwarding] = useState(false);
   const videoRef = useRef(null);
+  const playerContainerRef = useRef(null);
   const wasPlayingBeforeScrollRef = useRef(false);
+  const controlsTimeoutRef = useRef(null);
+  const pressTimerRef = useRef(null);
+  const isLongPressRef = useRef(false);
+  const pressStartCoordsRef = useRef({ x: 0, y: 0 });
 
   const currentModule = modulesData.find(module => module.id === activeTab);
 
@@ -27,9 +41,27 @@ const Demo = () => {
     }
   };
 
+  // Sincronizar estado de pantalla completa
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isFull = !!document.fullscreenElement;
+      setIsFullscreen(isFull);
+      
+      // Si salió de fullscreen (ej. con ESC o botón atrás del cel), desbloquear rotación
+      if (!isFull) {
+        if (window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+          window.screen.orientation.unlock();
+        }
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   // Cargar video nuevo al cambiar de pestaña
   useEffect(() => {
     setIsPlaying(false);
+    setHasStarted(false);
     setVideoProgress(0);
     if (videoRef.current) {
       videoRef.current.load();
@@ -112,11 +144,135 @@ const Demo = () => {
     }
   };
 
+  const handlePointerDown = (e) => {
+    if (!hasStarted || !isPlaying) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    
+    pressStartCoordsRef.current = { x: e.clientX, y: e.clientY };
+    isLongPressRef.current = false;
+    
+    // Si toca a la izquierda o derecha (los bordes de 25%)
+    const isEdge = x < rect.width * 0.25 || x > rect.width * 0.75;
+
+    if (isEdge) {
+      pressTimerRef.current = setTimeout(() => {
+        isLongPressRef.current = true;
+        if (videoRef.current) {
+          videoRef.current.playbackRate = 2.0;
+          setIsFastForwarding(true);
+        }
+      }, 300); // 300ms de presión para considerarlo long press
+    }
+  };
+
+  const handlePointerUp = (e) => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    
+    if (isLongPressRef.current) {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackRate; // Restaurar a la original
+      }
+      setIsFastForwarding(false);
+      isLongPressRef.current = false;
+      return; // Fin del long press, no interpretarlo como click
+    }
+
+    // Tolerancia al movimiento para considerarlo click (tap)
+    const dx = Math.abs(e.clientX - pressStartCoordsRef.current.x);
+    const dy = Math.abs(e.clientY - pressStartCoordsRef.current.y);
+    if (dx < 15 && dy < 15) {
+      handleVideoClickInternal(e);
+    }
+  };
+
+  const handlePointerLeave = () => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    if (isLongPressRef.current) {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackRate;
+      }
+      setIsFastForwarding(false);
+      isLongPressRef.current = false;
+    }
+  };
+
+  const handleVideoClickInternal = (e) => {
+    if (!hasStarted) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const isCenter = 
+      x > rect.width * 0.25 && x < rect.width * 0.75 &&
+      y > rect.height * 0.25 && y < rect.height * 0.75;
+
+    if (isCenter) {
+      handlePlayToggle();
+    } else {
+      setShowControlsMobile((prev) => {
+        const newState = !prev;
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+        if (newState) {
+          controlsTimeoutRef.current = setTimeout(() => {
+            setShowControlsMobile(false);
+          }, 3500);
+        }
+        return newState;
+      });
+    }
+  };
+
   const handleMuteToggle = (e) => {
     e.stopPropagation();
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  const toggleSpeed = (e) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    let newRate = 1;
+    if (playbackRate === 1) newRate = 1.5;
+    else if (playbackRate === 1.5) newRate = 2;
+    else newRate = 1;
+    
+    videoRef.current.playbackRate = newRate;
+    setPlaybackRate(newRate);
+  };
+
+  const skipForward = (e) => {
+    e.stopPropagation();
+    if (videoRef.current) videoRef.current.currentTime += 5;
+  };
+
+  const skipBackward = (e) => {
+    e.stopPropagation();
+    if (videoRef.current) videoRef.current.currentTime -= 5;
+  };
+
+  const toggleFullscreen = async (e) => {
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+      if (playerContainerRef.current) {
+        try {
+          await playerContainerRef.current.requestFullscreen();
+          // Forzar landscape en móviles usando Screen Orientation API
+          if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+            await window.screen.orientation.lock('landscape').catch((err) => {
+              console.log("La orientación forzada no está soportada en este navegador/dispositivo:", err);
+            });
+          }
+        } catch (err) {
+          console.error(`Error al entrar en pantalla completa: ${err.message}`);
+        }
+      }
+    } else {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
     }
   };
 
@@ -187,20 +343,40 @@ const Demo = () => {
           
           {/* Video Player Box */}
           <div id="demo-player-container" className="lg:col-span-8 flex flex-col justify-center scroll-mt-24">
-            <div className="relative rounded-2xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border border-surface-800 bg-black aspect-video group">
+            <div ref={playerContainerRef} className={`relative rounded-2xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border border-surface-800 bg-black group ${isFullscreen ? 'w-full h-full rounded-none border-none aspect-auto' : 'aspect-video'}`}>
               
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain cursor-pointer select-none"
+                style={{ WebkitTouchCallout: 'none' }}
                 src={currentModule.videoSrc}
                 preload="metadata"
                 playsInline
-                onClick={handlePlayToggle}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerLeave}
+                onContextMenu={(e) => e.preventDefault()}
                 onEnded={handleVideoEnded}
                 onTimeUpdate={handleTimeUpdate}
-                onPlay={() => setIsPlaying(true)}
+                onPlay={() => { setIsPlaying(true); setHasStarted(true); }}
                 onPause={() => setIsPlaying(false)}
               />
+
+              {/* Indicador de 2x Velocidad Mini */}
+              <AnimatePresence>
+                {isFastForwarding && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-4 right-4 z-40 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1 pointer-events-none"
+                  >
+                    <span className="text-white text-[11px] font-black tracking-wider">2x</span>
+                    <FastForward className="w-3 h-3 text-brand-400 animate-pulse" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Play Overlay Screen */}
               <AnimatePresence>
@@ -247,25 +423,63 @@ const Demo = () => {
                 )}
               </AnimatePresence>
 
-              {/* Minimal Player Controls (Compact, semi-transparent & out of the way) */}
-              <div className="absolute bottom-3 right-3 z-30 flex items-center gap-2">
-                <button
-                  onClick={handleMuteToggle}
-                  className="p-2 rounded-lg backdrop-blur-sm bg-surface-950/40 border border-surface-800/40 text-white hover:bg-white hover:text-surface-950 opacity-40 hover:opacity-100 transition-all duration-300 shadow-md"
-                  title={isMuted ? "Activar audio" : "Silenciar"}
+              {/* Full Player Controls */}
+              {hasStarted && (
+                <div 
+                  className={`absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/95 via-black/60 to-transparent p-4 flex flex-col gap-3 transition-opacity duration-300 ${isPlaying ? (showControlsMobile ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100') : 'opacity-100'}`}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-                {isPlaying && (
-                  <button
-                    onClick={handlePlayToggle}
-                    className="p-2 rounded-lg backdrop-blur-sm bg-surface-950/40 border border-surface-800/40 text-white hover:bg-white hover:text-surface-950 opacity-40 hover:opacity-100 transition-all duration-300 shadow-md"
-                    title="Pausar"
-                  >
-                    <Pause className="w-4 h-4 fill-current" />
-                  </button>
-                )}
-              </div>
+                   {/* Progress Bar */}
+                 <input 
+                   type="range" 
+                   min="0" max="1" step="0.001" 
+                   value={videoProgress}
+                   onChange={(e) => {
+                     e.stopPropagation();
+                     if (!videoRef.current) return;
+                     const pos = parseFloat(e.target.value);
+                     videoRef.current.currentTime = pos * videoRef.current.duration;
+                     setVideoProgress(pos);
+                   }}
+                   onMouseDown={() => {
+                     // Pause temporarily while dragging for smoother scrub if desired, but default is fine
+                   }}
+                   onClick={(e) => e.stopPropagation()}
+                   className="w-full h-1.5 bg-surface-800/80 rounded-full appearance-none cursor-pointer accent-brand-500 hover:h-2 transition-all duration-200 focus:outline-none focus:ring-0"
+                 />
+                   
+                   {/* Buttons */}
+                   <div className="flex items-center justify-between mt-1">
+                     <div className="flex items-center gap-5 text-white/80">
+                       <button onClick={handlePlayToggle} className="hover:text-white transition-colors transform hover:scale-110 active:scale-95" title={isPlaying ? "Pausar" : "Reproducir"}>
+                          {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+                       </button>
+                       <button onClick={skipBackward} className="hover:text-white transition-colors transform hover:scale-110 active:scale-95" title="-5 Segundos">
+                          <Rewind className="w-5 h-5 fill-current" />
+                       </button>
+                       <button onClick={skipForward} className="hover:text-white transition-colors transform hover:scale-110 active:scale-95" title="+5 Segundos">
+                          <FastForward className="w-5 h-5 fill-current" />
+                       </button>
+                       <button onClick={(e) => handleMuteToggle(e)} className="hover:text-white transition-colors transform hover:scale-110 active:scale-95" title={isMuted ? "Activar audio" : "Silenciar"}>
+                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                       </button>
+                     </div>
+                     
+                     <div className="flex items-center gap-3">
+                       <button 
+                         onClick={toggleSpeed} 
+                         className="text-[11px] font-black px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10 transform hover:scale-105 active:scale-95"
+                         title="Velocidad de reproducción"
+                       >
+                          {playbackRate}x
+                       </button>
+                       <button onClick={toggleFullscreen} className="hover:text-white transition-colors transform hover:scale-110 active:scale-95 text-white/80" title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
+                          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                       </button>
+                     </div>
+                   </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -297,9 +511,9 @@ const Demo = () => {
                   <div className="mt-6 space-y-4">
                     {currentModule.keyPoints.map((point, index) => (
                       <div key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${currentModule.accentColor}`} />
                         <div>
-                          <h5 className="font-bold text-[14px] text-white leading-tight">{point.title}</h5>
+                          <h5 className={`font-bold text-[14px] leading-tight ${currentModule.accentColor}`}>{point.title}</h5>
                           <p className="text-[12px] text-surface-400 mt-0.5 leading-relaxed">{point.desc}</p>
                         </div>
                       </div>
@@ -309,13 +523,6 @@ const Demo = () => {
 
                 <div className="mt-8 border-t border-surface-800/80 pt-5 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-surface-500 tracking-widest uppercase">MultiGymCR</span>
-                  <button 
-                    onClick={handlePlayToggle}
-                    className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${currentModule.accentColor} hover:text-white`}
-                  >
-                    {isPlaying ? 'Detener Preview' : 'Ver video'}
-                    <Play className="w-3 h-3 fill-current ml-0.5" />
-                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>

@@ -18,6 +18,10 @@ const faqs = [
   {
     question: "¿El soporte técnico está incluido en el plan?",
     answer: "¡Por supuesto! Todos nuestros planes incluyen soporte técnico prioritario a través de WhatsApp y correo electrónico para resolver cualquier duda o inconveniente que puedas tener."
+  },
+  {
+    question: "¿El software se actualiza o puede integrarse con otras herramientas?",
+    answer: "Sí. El sistema recibe mantenimiento continuo y actualizaciones sin costo para que nunca se vuelva obsoleto. Si tu gimnasio necesita una integración específica o un desarrollo a gran escala, lo cotizamos a la medida. Como valor agregado: si tu solicitud es una mejora que beneficia a toda nuestra comunidad de gimnasios, la desarrollamos y la incluimos totalmente gratis."
   }
 ];
 

@@ -29,23 +29,6 @@ export const modulesData = [
     ]
   },
   {
-    id: 'acceso',
-    title: 'Control de Acceso',
-    description: 'Automatiza el ingreso de tus socios mediante múltiples métodos integrados de validación.',
-    videoSrc: '/videos/acceso.mp4',
-    icon: QrCode,
-    color: 'from-accent-500 to-accent-600',
-    borderColor: 'border-accent-500/30',
-    glowColor: 'bg-accent-500/20',
-    accentColor: 'text-accent-400',
-    glowHex: '#06b6d4',
-    keyPoints: [
-      { title: 'Acceso por Código QR', desc: 'Los socios escanean su pase digital dinámico directamente desde la app móvil.' },
-      { title: 'Validación Instantánea', desc: 'Verificación del estado de pago del miembro en milisegundos para permitir el paso.' },
-      { title: 'Soporte de Hardware', desc: 'Listo para integrar con torniquetes, lectores de códigos y cerraduras eléctricas.' }
-    ]
-  },
-  {
     id: 'usuarios',
     title: 'Gestión de Socios',
     description: 'Administra toda la información, membresías e historial de tus clientes en una sola ficha unificada.',
@@ -60,23 +43,6 @@ export const modulesData = [
       { title: 'Ficha Única de Cliente', desc: 'Datos personales, contactos de emergencia, fotos, medidas e historial médico.' },
       { title: 'Estados y Membresías', desc: 'Controla vencimientos, congelamientos temporales y renovaciones con un clic.' },
       { title: 'Historial de Asistencia', desc: 'Registro de accesos para identificar horas pico y hábitos de asistencia.' }
-    ]
-  },
-  {
-    id: 'facturacion',
-    title: 'Facturas y Pagos',
-    description: 'Simplifica la administración de dinero, automatiza recibos y elimina las cuentas morosas.',
-    videoSrc: '/videos/facturacion.mp4',
-    icon: Receipt,
-    color: 'from-green-500 to-green-600',
-    borderColor: 'border-green-500/30',
-    glowColor: 'bg-green-500/20',
-    accentColor: 'text-green-400',
-    glowHex: '#22c55e',
-    keyPoints: [
-      { title: 'Cobros Recurrentes', desc: 'Configuración automática de cargos recurrentes por membresía.' },
-      { title: 'Recibos Digitales', desc: 'Generación e impresión de recibos profesionales con envío automático.' },
-      { title: 'Control de Deudas', desc: 'Filtra y contacta de inmediato a socios con saldos pendientes.' }
     ]
   },
   {
@@ -97,6 +63,23 @@ export const modulesData = [
     ]
   },
   {
+    id: 'facturacion',
+    title: 'Facturas y Pagos',
+    description: 'Simplifica la administración de dinero, automatiza recibos y elimina las cuentas morosas.',
+    videoSrc: '/videos/facturacion.mp4',
+    icon: Receipt,
+    color: 'from-green-500 to-green-600',
+    borderColor: 'border-green-500/30',
+    glowColor: 'bg-green-500/20',
+    accentColor: 'text-green-400',
+    glowHex: '#22c55e',
+    keyPoints: [
+      { title: 'Cobros Recurrentes', desc: 'Configuración automática de cargos recurrentes por membresía.' },
+      { title: 'Recibos Digitales', desc: 'Generación e impresión de recibos profesionales con envío automático.' },
+      { title: 'Control de Deudas', desc: 'Filtra y contacta de inmediato a socios con saldos pendientes.' }
+    ]
+  },
+  {
     id: 'tienda',
     title: 'Punto de Venta (POS)',
     description: 'Incrementa tus ingresos vendiendo suplementos, bebidas y accesorios directamente desde la recepción.',
@@ -111,6 +94,23 @@ export const modulesData = [
       { title: 'Venta Ágil en Recepción', desc: 'Agrega productos al carrito y cobra de forma fluida en segundos.' },
       { title: 'Control de Stock', desc: 'Actualización en tiempo real del inventario con notificaciones de stock mínimo.' },
       { title: 'Arqueo de Caja Diario', desc: 'Cierre de caja exacto y transparente por turno para evitar discrepancias.' }
+    ]
+  },
+  {
+    id: 'acceso',
+    title: 'Control de Acceso',
+    description: 'Automatiza el ingreso de tus socios mediante múltiples métodos integrados de validación.',
+    videoSrc: '/videos/acceso.mp4',
+    icon: QrCode,
+    color: 'from-accent-500 to-accent-600',
+    borderColor: 'border-accent-500/30',
+    glowColor: 'bg-accent-500/20',
+    accentColor: 'text-accent-400',
+    glowHex: '#06b6d4',
+    keyPoints: [
+      { title: 'Acceso por Código QR', desc: 'Los socios escanean su pase digital dinámico directamente desde la app móvil.' },
+      { title: 'Validación Instantánea', desc: 'Verificación del estado de pago del miembro en milisegundos para permitir el paso.' },
+      { title: 'Soporte de Hardware', desc: 'Listo para integrar con torniquetes, lectores de códigos y cerraduras eléctricas.' }
     ]
   },
   {

@@ -56,7 +56,7 @@ const CTAFinal = () => {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="https://wa.me/50663313764"
+              href="https://wa.me/50671850604"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 bg-green-500 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-green-600 hover:shadow-glow-green transition-all btn-shimmer"

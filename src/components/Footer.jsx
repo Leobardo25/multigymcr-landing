@@ -19,9 +19,13 @@ const Footer = () => {
 
   const handleNavClick = (e, target) => {
     e.preventDefault();
-    const element = document.querySelector(target);
-    if (element) {
-      element.scrollIntoView();
+    if (window.lenis) {
+      window.lenis.scrollTo(target);
+    } else {
+      const element = document.querySelector(target);
+      if (element) {
+        element.scrollIntoView();
+      }
     }
   };
 
@@ -36,13 +40,13 @@ const Footer = () => {
             {/* Column 1: Brand */}
             <div className="text-center md:text-left">
               <a href="#inicio" onClick={(e) => handleNavClick(e, '#inicio')} className="inline-flex items-center gap-2.5 group">
-                <motion.div
-                  className="bg-gradient-to-br from-brand-500 to-accent-500 text-white p-2 rounded-lg"
-                  whileHover={{ scale: 1.1 }}
+                <motion.img
+                  src="/logo.jpeg"
+                  alt="MultiGymCR Logo"
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover shadow-glow-sm border border-white/10"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                >
-                  <BoltIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-                </motion.div>
+                />
                 <span className="text-lg sm:text-xl font-bold text-white group-hover:text-brand-400 transition-colors">
                   MultiGymCR
                 </span>
@@ -56,8 +60,8 @@ const Footer = () => {
               <div className="mt-6 flex gap-3 justify-center md:justify-start">
                 {[
                   { icon: <FaInstagram className="h-4 w-4" />, href: "#", label: "Instagram" },
-                  { icon: <FaFacebookF className="h-4 w-4" />, href: "#", label: "Facebook" },
-                  { icon: <FaWhatsapp className="h-4 w-4" />, href: "https://wa.me/50663313764", label: "WhatsApp" },
+                  { icon: <FaFacebookF className="h-4 w-4" />, href: "https://www.facebook.com/profile.php?id=61579264718532", label: "Facebook" },
+                  { icon: <FaWhatsapp className="h-4 w-4" />, href: "https://wa.me/50671850604", label: "WhatsApp" },
                 ].map((social, idx) => (
                   <a
                     key={idx}
@@ -95,7 +99,7 @@ const Footer = () => {
             <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-surface-400 uppercase tracking-wider mb-4">Contacto</h3>
               <a
-                href="https://wa.me/50663313764"
+                href="https://wa.me/50671850604"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-glow-green transition-all active:scale-95 btn-shimmer"
@@ -111,20 +115,29 @@ const Footer = () => {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-surface-600">
-              &copy; {new Date().getFullYear()} MultiGymCR. Todos los derechos reservados.
-            </p>
-
-            <div className="flex items-center gap-4 text-xs text-surface-600">
-              <button onClick={() => setIsTermsOpen(true)} className="hover:text-surface-300 transition-colors">Términos</button>
-              <span className="text-surface-800">|</span>
-              <button onClick={() => setIsPrivacyOpen(true)} className="hover:text-surface-300 transition-colors">Privacidad</button>
+          <div className="mt-12 pt-8 border-t border-surface-800/60 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <p className="text-xs text-surface-500 font-medium">
+                &copy; {new Date().getFullYear()} MultiGymCR. Todos los derechos reservados.
+              </p>
+              <div className="hidden sm:block w-1 h-1 rounded-full bg-surface-800" />
+              <div className="flex items-center gap-4 text-xs text-surface-500 font-medium">
+                <button onClick={() => setIsTermsOpen(true)} className="hover:text-white transition-colors">Términos de Servicio</button>
+                <button onClick={() => setIsPrivacyOpen(true)} className="hover:text-white transition-colors">Aviso de Privacidad</button>
+              </div>
             </div>
 
-            <p className="text-xs text-surface-700">
-              Desarrollado con ❤️ por <span className="text-surface-500">Presencia Digital CR</span>
-            </p>
+            <a href="https://nexoradigitalcr.com" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center lg:items-end gap-1.5 px-4 py-2.5 rounded-xl bg-surface-900/50 border border-surface-800/50 hover:border-brand-500/30 hover:bg-surface-800/50 transition-all group cursor-pointer">
+              <p className="text-[10px] uppercase tracking-widest text-surface-500 font-bold group-hover:text-surface-400 transition-colors">
+                Software Desarrollado Por
+              </p>
+              <div className="flex items-center gap-2">
+                <BoltIcon className="w-4 h-4 text-brand-500 group-hover:text-brand-400 transition-colors" />
+                <span className="text-[15px] font-black tracking-tight text-white">
+                  NEXORA <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">DIGITAL CR</span>
+                </span>
+              </div>
+            </a>
           </div>
         </div>
       </footer>

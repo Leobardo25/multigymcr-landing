@@ -59,10 +59,13 @@ const Header = () => {
 
   const handleNavClick = (e, target) => {
     e.preventDefault();
-    const element = document.querySelector(target);
-    if (element) {
-      // El scroll behavior ya está definido en CSS como smooth, usar scrollIntoView nativo evita bugs de doble scroll.
-      element.scrollIntoView();
+    if (window.lenis) {
+      window.lenis.scrollTo(target);
+    } else {
+      const element = document.querySelector(target);
+      if (element) {
+        element.scrollIntoView();
+      }
     }
     setIsMenuOpen(false);
   };
@@ -90,13 +93,13 @@ const Header = () => {
             onClick={(e) => handleNavClick(e, '#inicio')}
             className="flex items-center gap-2.5 group"
           >
-            <motion.div
-              className="bg-gradient-to-br from-brand-500 to-accent-500 text-white p-2 rounded-lg shadow-glow-sm"
-              whileHover={{ scale: 1.1, rotate: -8 }}
+            <motion.img
+              src="/logo.jpeg"
+              alt="MultiGymCR Logo"
+              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover shadow-glow-sm border border-white/10"
+              whileHover={{ scale: 1.05, rotate: -5 }}
               whileTap={{ scale: 0.95 }}
-            >
-              <BoltIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-            </motion.div>
+            />
             <span className="text-lg sm:text-xl font-bold text-white group-hover:text-brand-400 transition-colors">
               MultiGymCR
             </span>

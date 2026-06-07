@@ -4,19 +4,9 @@ import { CurrencyDollarIcon, ClockIcon, ShieldExclamationIcon } from '@heroicons
 
 const problems = [
   {
-    icon: CurrencyDollarIcon,
-    title: "Fugas de Ingresos",
-    description: "Cada mes pierde clientes y dinero porque las membresías vencidas siguen entrando sin pagar.",
-    color: "red",
-    iconBg: "from-red-500/20 to-red-600/20",
-    iconColor: "text-red-400",
-    borderHover: "hover:border-red-500/30",
-    glowColor: "group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]",
-  },
-  {
     icon: ClockIcon,
-    title: "Tiempo Perdido",
-    description: "Horas valiosas gastadas revisando hojas de cálculo en lugar de hacer crecer el negocio.",
+    title: "El caos de los Excel y las listas de papel.",
+    description: "¿Sigue perdiendo horas cerrando cajas y buscando nombres en listas interminables? Su negocio merece automatización, no horas extra de trabajo administrativo.",
     color: "amber",
     iconBg: "from-amber-500/20 to-amber-600/20",
     iconColor: "text-amber-400",
@@ -24,9 +14,19 @@ const problems = [
     glowColor: "group-hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
   },
   {
+    icon: CurrencyDollarIcon,
+    title: "Gente entrando gratis a su gimnasio.",
+    description: "Cada persona que entra sin pagar es dinero que se evapora de su bolsillo. Tome el control total de quién entra y quién sale con validación automática.",
+    color: "red",
+    iconBg: "from-red-500/20 to-red-600/20",
+    iconColor: "text-red-400",
+    borderHover: "hover:border-red-500/30",
+    glowColor: "group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]",
+  },
+  {
     icon: ShieldExclamationIcon,
-    title: "Acceso Inseguro",
-    description: "Personal distraído actuando como guardia, en vez de atender y vender.",
+    title: "Clientes que se van y usted ni cuenta se da.",
+    description: "¿Sabe quién dejó de pagar hoy? ¿Cuántos clientes perdió esta semana? Si no tiene datos en tiempo real, está gestionando su gimnasio a ciegas.",
     color: "orange",
     iconBg: "from-orange-500/20 to-orange-600/20",
     iconColor: "text-orange-400",
