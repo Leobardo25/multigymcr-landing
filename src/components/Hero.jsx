@@ -3,9 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import InteractiveNetwork from './InteractiveNetwork';
-
-
 
 const Hero = () => {
   const handleNavClick = (e, target) => {
@@ -27,41 +24,18 @@ const Hero = () => {
         <div className="absolute inset-0 bg-mesh opacity-50" />
       </div>
 
-      {/* Interactive 3D Canvas Background (AQUÍ DEBE ESTAR, SOBRE EL FONDO OSCURO) */}
-      <InteractiveNetwork />
+      {/* Hero Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40" 
+        style={{ backgroundImage: 'url(/hero-gym.png)' }}
+      />
+      
+      {/* Gradient Overlay para asegurar legibilidad */}
+      <div className="absolute inset-0 bg-gradient-to-b from-surface-950/40 via-surface-950/60 to-surface-950" />
       
       {/* Capa de puntos por encima del canvas */}
       <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
 
-      {/* Ecosistema Líquido Cuántico (Background) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden mix-blend-screen">
-        <motion.div
-          animate={{ 
-            x: [0, 30, -20, 0], 
-            y: [0, -40, 20, 0],
-            borderRadius: ["40% 60% 70% 30%", "60% 40% 30% 70%", "70% 30% 60% 40%", "40% 60% 70% 30%"]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[10%] left-[10%] w-[350px] h-[350px] sm:w-[500px] sm:h-[500px] bg-brand-500/20 blur-[120px]"
-        />
-        <motion.div
-          animate={{ 
-            x: [0, -40, 20, 0], 
-            y: [0, 30, -30, 0],
-            borderRadius: ["60% 40% 30% 70%", "30% 70% 60% 40%", "70% 30% 40% 60%", "60% 40% 30% 70%"]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[5%] right-[5%] w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] bg-accent-500/20 blur-[120px]"
-        />
-        <motion.div
-          animate={{ 
-            scale: [1, 1.2, 0.9, 1],
-            borderRadius: ["50% 50% 50% 50%", "40% 60% 60% 40%", "60% 40% 40% 60%", "50% 50% 50% 50%"]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[30%] left-[40%] -translate-x-1/2 w-[600px] h-[600px] bg-purple-600/10 blur-[150px]"
-        />
-      </div>
 
       <div className="section-container relative z-10">
         <div className="max-w-4xl mx-auto text-center">
