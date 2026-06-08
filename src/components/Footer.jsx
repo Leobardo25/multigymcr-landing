@@ -109,7 +109,7 @@ const Footer = () => {
               </a>
 
               <p className="mt-4 text-sm text-surface-600">
-                multigymcr@gmail.com
+                multigymcr25@gmail.com
               </p>
             </div>
           </div>

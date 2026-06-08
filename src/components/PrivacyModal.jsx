@@ -44,7 +44,7 @@ const PrivacyModal = ({ isOpen, onClose }) => {
             <h3 className="font-bold text-surface-200 pt-2">4. Seguridad de los Datos</h3>
             <p>Implementamos medidas de seguridad técnicas y organizativas para proteger los datos contra el acceso no autorizado, la alteración o la destrucción. Sin embargo, ningún sistema es 100% seguro.</p>
 
-            <p className="pt-4 border-t border-white/5 mt-4">Si tiene alguna pregunta sobre esta Política de Privacidad, por favor contáctenos en multigymcr@gmail.com.</p>
+            <p className="pt-4 border-t border-white/5 mt-4">Si tiene alguna pregunta sobre esta Política de Privacidad, por favor contáctenos en multigymcr25@gmail.com.</p>
           </div>
         </motion.div>
       </div>
