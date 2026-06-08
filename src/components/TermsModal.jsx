@@ -47,7 +47,7 @@ const TermsModal = ({ isOpen, onClose }) => {
             <h3 className="font-bold text-surface-200 pt-2">5. Modificaciones</h3>
             <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Se notificará a los clientes de cualquier cambio significativo. El uso continuado del servicio después de dichos cambios constituirá su consentimiento a tales cambios.</p>
 
-            <p className="pt-4 border-t border-white/5 mt-4">Si tiene alguna pregunta sobre estos Términos, por favor contáctenos en info@multigymcr.com.</p>
+            <p className="pt-4 border-t border-white/5 mt-4">Si tiene alguna pregunta sobre estos Términos, por favor contáctenos en multigymcr@gmail.com.</p>
           </div>
         </motion.div>
       </div>

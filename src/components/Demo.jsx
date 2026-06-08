@@ -251,27 +251,34 @@ const Demo = () => {
   const skipBackward = (e) => {
     e.stopPropagation();
     if (videoRef.current) videoRef.current.currentTime -= 5;
-  };
-
-  const toggleFullscreen = async (e) => {
+  };  const toggleFullscreen = async (e) => {
     e.stopPropagation();
-    if (!document.fullscreenElement) {
-      if (playerContainerRef.current) {
+    const container = playerContainerRef.current;
+    const video = videoRef.current;
+    if (!container || !video) return;
+
+    if (container.requestFullscreen) {
+      if (!document.fullscreenElement) {
         try {
-          await playerContainerRef.current.requestFullscreen();
-          // Forzar landscape en móviles usando Screen Orientation API
+          await container.requestFullscreen();
           if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
             await window.screen.orientation.lock('landscape').catch((err) => {
-              console.log("La orientación forzada no está soportada en este navegador/dispositivo:", err);
+              console.log("Orientación no soportada:", err);
             });
           }
         } catch (err) {
-          console.error(`Error al entrar en pantalla completa: ${err.message}`);
+          console.error("Error al entrar en pantalla completa:", err);
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
         }
       }
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
+    } else if (video.webkitEnterFullscreen) {
+      try {
+        video.webkitEnterFullscreen();
+      } catch (err) {
+        console.error("Error webkitEnterFullscreen:", err);
       }
     }
   };

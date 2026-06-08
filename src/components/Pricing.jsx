@@ -127,7 +127,7 @@ const Pricing = () => {
                   <div className="bg-gradient-to-r from-red-600 to-brand-400 h-1.5 rounded-full w-[40%]" />
                 </div>
                 <p className="text-surface-300 text-[13px] text-left leading-relaxed">
-                  <strong className="text-white">2 gimnasios</strong> ya reclamaron esta oferta. Al llenarse los 3 cupos restantes, el sistema volverá a su valor comercial de ₡120,000 mensuales.
+                  <strong className="text-white">2 gimnasios</strong> ya reclamaron esta oferta. Al llenarse los 3 cupos restantes, el sistema volverá a su valor comercial estándar de ₡70,000 mensuales.
                 </p>
               </div>
             </div>

@@ -54,6 +54,12 @@ const Hero = () => {
     };
   }, [isModalOpen]);
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsModalOpen(false);
+    }
+  };
+
   return (
     <section
       id="inicio"
@@ -77,93 +83,124 @@ const Hero = () => {
       {/* Capa de puntos por encima del canvas */}
       <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
 
-      <div className="section-container relative z-10">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+      <div className="section-container relative z-10 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto text-center lg:text-left">
           
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] sm:leading-[1.05] tracking-tight px-2"
-          >
-            Deje de Perder
-            <br />
-            <span className="text-gradient">Tiempo y Dinero.</span>
-          </motion.h1>
+          {/* Columna Izquierda: Contenido de Texto y CTAs */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] sm:leading-[1.05] tracking-tight px-2 lg:px-0"
+            >
+              Deje de Perder
+              <br />
+              <span className="text-gradient">Tiempo y Dinero.</span>
+            </motion.h1>
 
-          {/* Miniatura de Video en medio del título y las letras */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-6 mb-6 relative group cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          >
-            {/* Glow animado detrás de la miniatura */}
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse" />
-            
-            {/* Contenedor miniatura */}
-            <div className="relative w-44 sm:w-56 aspect-video rounded-2xl overflow-hidden border-[3px] border-surface-800 bg-surface-950 shadow-2xl transition-transform duration-300 group-hover:scale-105 group-active:scale-98">
-              {/* Micro-video de fondo silencioso en loop */}
-              <video
-                src="/hero.mp4"
-                muted
-                loop
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover opacity-60 group-hover:opacity-50 transition-opacity"
-              />
-              {/* Overlay y Botón de Play */}
-              <div className="absolute inset-0 flex items-center justify-center bg-surface-950/20 group-hover:bg-surface-950/10 transition-colors">
-                <div className="w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-brand-500/90 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:bg-brand-400 group-hover:scale-110 transition-all border border-white/20">
-                  <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 translate-x-[2px]" />
+            {/* Miniatura de Video en móvil (Oculta en PC) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mt-6 mb-6 block lg:hidden relative group cursor-pointer"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse" />
+              <div className="relative w-[170px] sm:w-[215px] aspect-video rounded-2xl overflow-hidden border-[3px] border-surface-800 bg-surface-950 shadow-2xl transition-transform duration-300 group-hover:scale-105 group-active:scale-98">
+                <video
+                  src="/hero.mp4"
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover opacity-60 group-hover:opacity-50 transition-opacity"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-surface-950/20 group-hover:bg-surface-950/10 transition-colors">
+                  <div className="w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-brand-500/90 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:bg-brand-400 group-hover:scale-110 transition-all border border-white/20">
+                    <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 translate-x-[2px]" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-
-          {/* Descripción ("las letras") */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="text-base sm:text-lg lg:text-xl text-surface-400 max-w-xl mx-auto leading-relaxed px-4"
-          >
-            El <strong>software de élite</strong> para gimnasios que automatiza accesos,
-            suscripciones y rutinas desde una sola plataforma, a un <strong>precio sin competencia</strong> en el mercado. 💪🏽
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center px-4"
-          >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto p-[1px] rounded-xl bg-gradient-to-r from-brand-500/60 via-accent-500/60 to-brand-500/60 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-            >
-              <a
-                onClick={(e) => handleNavClick(e, "#demo")}
-                href="#demo"
-                className="w-full sm:max-w-none flex items-center justify-center gap-2 bg-surface-950/90 backdrop-blur-sm text-white font-semibold text-base px-6 py-3 rounded-xl hover:bg-surface-900/80 transition-all"
-              >
-                Ver Funcionalidades
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <ArrowRightIcon className="ml-1 h-4 w-4 sm:h-5 sm:w-5 text-accent-400" />
-                </motion.div>
-              </a>
             </motion.div>
-          </motion.div>
+
+            {/* Descripción ("las letras") */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="text-base sm:text-lg lg:text-xl text-surface-400 max-w-xl mx-auto lg:mx-0 leading-relaxed px-4 lg:px-0"
+            >
+              El <strong>software de élite</strong> para gimnasios que automatiza accesos,
+              suscripciones y rutinas desde una sola plataforma, a un <strong>precio sin competencia</strong> en el mercado. 💪🏽
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start px-4 lg:px-0 w-full sm:w-auto"
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full sm:w-auto p-[1px] rounded-xl bg-gradient-to-r from-brand-500/60 via-accent-500/60 to-brand-500/60 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+              >
+                <a
+                  onClick={(e) => handleNavClick(e, "#demo")}
+                  href="#demo"
+                  className="w-full sm:max-w-none flex items-center justify-center gap-2 bg-surface-950/90 backdrop-blur-sm text-white font-semibold text-base px-6 py-3 rounded-xl hover:bg-surface-900/80 transition-all"
+                >
+                  Ver Funcionalidades
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ArrowRightIcon className="ml-1 h-4 w-4 sm:h-5 sm:w-5 text-accent-400" />
+                  </motion.div>
+                </a>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Columna Derecha: Miniatura de Video en PC (Oculta en móvil) */}
+          <div className="hidden lg:flex justify-end w-full">
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="relative group cursor-pointer lg:ml-auto"
+              onClick={() => setIsModalOpen(true)}
+            >
+              {/* Glow animado detrás de la miniatura */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-brand-500 to-accent-500 rounded-3xl blur-xl opacity-35 group-hover:opacity-60 transition duration-500 animate-pulse" />
+              
+              {/* Contenedor miniatura */}
+              <div className="relative w-[220px] xl:w-[250px] aspect-video rounded-2xl overflow-hidden border-[4px] border-surface-900 bg-surface-950 shadow-2xl transition-all duration-300 group-hover:scale-[1.03] group-active:scale-98 ring-1 ring-white/5">
+                {/* Micro-video de fondo silencioso en loop */}
+                <video
+                  src="/hero.mp4"
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover opacity-65 group-hover:opacity-55 transition-opacity"
+                />
+                {/* Overlay y Botón de Play */}
+                <div className="absolute inset-0 flex items-center justify-center bg-surface-950/30 group-hover:bg-surface-950/15 transition-colors">
+                  <div className="w-14 h-14 flex items-center justify-center rounded-full bg-brand-500/90 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] group-hover:bg-brand-400 group-hover:scale-110 transition-all border border-white/20">
+                    <PlayIcon className="w-7 h-7 translate-x-[2px]" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
         </div>
       </div>
-
 
       {/* Bottom gradient fade into next section */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-950 to-transparent pointer-events-none" />
@@ -176,10 +213,10 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-md"
-            onClick={() => setIsModalOpen(false)}
+            onClick={handleBackdropClick}
           >
             {/* Contenedor relativo de tamaño y altura flexibles para alojar video y botón */}
-            <div className="relative w-[82%] max-w-[270px] md:max-w-[380px] lg:max-w-[440px] flex flex-col items-center">
+            <div className="relative w-[82%] max-w-[230px] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-center">
               
               {/* Botón de Cerrar (Flota afuera del video, arriba a la derecha) */}
               <button
@@ -196,7 +233,6 @@ const Hero = () => {
                 exit={{ scale: 0.9, y: 20 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 className="w-full aspect-video rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border-[6px] sm:border-[8px] border-surface-900 bg-surface-950 ring-1 ring-white/10"
-                onClick={(e) => e.stopPropagation()}
               >
                 <video
                   ref={modalVideoRef}
