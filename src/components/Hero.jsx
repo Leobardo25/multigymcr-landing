@@ -110,9 +110,12 @@ const Hero = () => {
             >
               <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse" />
               <div className="relative w-[170px] sm:w-[215px] aspect-video rounded-2xl overflow-hidden border-[3px] border-surface-800 bg-surface-950 shadow-2xl transition-transform duration-300 group-hover:scale-105 group-active:scale-98">
-                <img
-                  src="/hero-gym.png"
-                  alt="Ver video explicativo"
+                <video
+                  src="/hero.mp4"
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-50 transition-opacity"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-surface-950/20 group-hover:bg-surface-950/10 transition-colors">
@@ -178,9 +181,12 @@ const Hero = () => {
               {/* Contenedor miniatura */}
               <div className="relative w-[220px] xl:w-[250px] aspect-video rounded-2xl overflow-hidden border-[4px] border-surface-900 bg-surface-950 shadow-2xl transition-all duration-300 group-hover:scale-[1.03] group-active:scale-98 ring-1 ring-white/5">
                 {/* Micro-video de fondo silencioso en loop */}
-                <img
-                  src="/hero-gym.png"
-                  alt="Ver video explicativo"
+                <video
+                  src="/hero.mp4"
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
                   className="w-full h-full object-cover opacity-65 group-hover:opacity-55 transition-opacity"
                 />
                 {/* Overlay y Botón de Play */}
