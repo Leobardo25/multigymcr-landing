@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion, useInView } from "framer-motion";
-import { ArrowRightIcon } from "@heroicons/react/24/solid";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRightIcon, PlayIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const Hero = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPromoBtn, setShowPromoBtn] = useState(false);
+  const modalVideoRef = useRef(null);
+
   const handleNavClick = (e, target) => {
     e.preventDefault();
     const element = document.querySelector(target);
@@ -13,10 +16,48 @@ const Hero = () => {
     }
   };
 
+  const handleTimeUpdate = (e) => {
+    const video = e.target;
+    if (video.duration && video.duration - video.currentTime <= 10) {
+      setShowPromoBtn(true);
+    } else {
+      setShowPromoBtn(false);
+    }
+  };
+
+  // Bloquear/Desbloquear el scroll general cuando el modal está abierto
+  useEffect(() => {
+    if (isModalOpen) {
+      // Detener Lenis y bloquear scroll nativo
+      window.lenis?.stop();
+      document.documentElement.classList.add("lenis-stopped");
+      document.body.style.overflow = "hidden";
+      
+      if (modalVideoRef.current) {
+        modalVideoRef.current.play().catch((err) => {
+          console.log("Autoplay con audio bloqueado por navegador, intentando con controles", err);
+        });
+      }
+    } else {
+      // Reanudar Lenis y restaurar scroll nativo
+      window.lenis?.start();
+      document.documentElement.classList.remove("lenis-stopped");
+      document.body.style.overflow = "";
+      setShowPromoBtn(false);
+    }
+
+    // Cleanup para reestablecer el scroll si el componente se desmonta inesperadamente
+    return () => {
+      window.lenis?.start();
+      document.documentElement.classList.remove("lenis-stopped");
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen]);
+
   return (
     <section
       id="inicio"
-      className="relative min-h-[100dvh] flex items-center pt-24 md:pt-28 pb-20 overflow-hidden"
+      className="relative min-h-[100dvh] flex items-center pt-20 md:pt-28 pb-16 overflow-hidden"
     >
       {/* Background layers base */}
       <div className="absolute inset-0">
@@ -36,26 +77,58 @@ const Hero = () => {
       {/* Capa de puntos por encima del canvas */}
       <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
 
-
       <div className="section-container relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+          
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.1] sm:leading-[1.05] tracking-tight px-2"
+            className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] sm:leading-[1.05] tracking-tight px-2"
           >
             Deje de Perder
             <br />
             <span className="text-gradient">Tiempo y Dinero.</span>
           </motion.h1>
 
+          {/* Miniatura de Video en medio del título y las letras */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="mt-6 mb-6 relative group cursor-pointer"
+            onClick={() => setIsModalOpen(true)}
+          >
+            {/* Glow animado detrás de la miniatura */}
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse" />
+            
+            {/* Contenedor miniatura */}
+            <div className="relative w-44 sm:w-56 aspect-video rounded-2xl overflow-hidden border-[3px] border-surface-800 bg-surface-950 shadow-2xl transition-transform duration-300 group-hover:scale-105 group-active:scale-98">
+              {/* Micro-video de fondo silencioso en loop */}
+              <video
+                src="/hero.mp4"
+                muted
+                loop
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover opacity-60 group-hover:opacity-50 transition-opacity"
+              />
+              {/* Overlay y Botón de Play */}
+              <div className="absolute inset-0 flex items-center justify-center bg-surface-950/20 group-hover:bg-surface-950/10 transition-colors">
+                <div className="w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-brand-500/90 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:bg-brand-400 group-hover:scale-110 transition-all border border-white/20">
+                  <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 translate-x-[2px]" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Descripción ("las letras") */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-6 sm:mt-8 text-base sm:text-lg lg:text-xl text-surface-400 max-w-xl mx-auto leading-relaxed px-4"
+            className="text-base sm:text-lg lg:text-xl text-surface-400 max-w-xl mx-auto leading-relaxed px-4"
           >
             El <strong>software de élite</strong> para gimnasios que automatiza accesos,
             suscripciones y rutinas desde una sola plataforma, a un <strong>precio sin competencia</strong> en el mercado. 💪🏽
@@ -65,8 +138,8 @@ const Hero = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-            className="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center px-4"
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center px-4"
           >
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -88,75 +161,86 @@ const Hero = () => {
               </a>
             </motion.div>
           </motion.div>
-
-          {/* Se eliminaron los Floating Metrics a favor de la Red Interactiva 3D */}
-
-
         </div>
       </div>
 
-      {/* Scroll Down Indicator */}
-      <motion.div 
-        className="absolute bottom-[4.5rem] sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center justify-center cursor-pointer"
-        onClick={(e) => handleNavClick(e, '#problema')}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="bg-surface-900/80 p-2 rounded-full border border-surface-800/50 shadow-[0_0_15px_rgba(99,102,241,0.1)] hover:bg-surface-800 transition-colors backdrop-blur-sm"
-        >
-          <ChevronDownIcon className="w-5 h-5 text-brand-400" />
-        </motion.div>
-      </motion.div>
 
       {/* Bottom gradient fade into next section */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-950 to-transparent pointer-events-none" />
+
+      {/* MODAL DE VIDEO EXPANDIDO */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-md"
+            onClick={() => setIsModalOpen(false)}
+          >
+            {/* Contenedor relativo de tamaño y altura flexibles para alojar video y botón */}
+            <div className="relative w-[82%] max-w-[270px] md:max-w-[380px] lg:max-w-[440px] flex flex-col items-center">
+              
+              {/* Botón de Cerrar (Flota afuera del video, arriba a la derecha) */}
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute -top-12 -right-2 md:-right-4 z-50 p-2 rounded-full bg-surface-950/80 text-white hover:bg-surface-900 border border-surface-800/50 transition-all backdrop-blur-sm shadow-lg hover:scale-105 active:scale-95"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+
+              {/* Caja del Video */}
+              <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="w-full aspect-video rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border-[6px] sm:border-[8px] border-surface-900 bg-surface-950 ring-1 ring-white/10"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <video
+                  ref={modalVideoRef}
+                  src="/hero.mp4"
+                  controls
+                  playsInline
+                  onTimeUpdate={handleTimeUpdate} // Escuchar los cambios de tiempo
+                  onEnded={() => setIsModalOpen(false)} // Se minimiza solo al terminar
+                  className="w-full h-full object-contain bg-black"
+                  style={{ WebkitTouchCallout: 'none' }}
+                />
+              </motion.div>
+
+              {/* Botón de WhatsApp promocional cuando faltan 10s */}
+              <AnimatePresence>
+                {showPromoBtn && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="w-full mt-4 flex justify-center z-40"
+                  >
+                    <a
+                      href="https://wa.me/50671850604?text=Hola!%20Quiero%20aplicar%20a%20la%20promo%20ahora%20💪🏽"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3 px-4 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-105 active:scale-98 text-center"
+                    >
+                      {/* Icono de WhatsApp oficial */}
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                      </svg>
+                      Quiero aplicar a la promo ahora
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
 
 export default Hero;
-
-/*
- * ────────────────────────────────────────────────────────
- * MOCKUP DEVICES (OCULTO — NO ELIMINAR)
- * Código de la alternancia mobile/desktop mockup.
- * Reactivar cuando se tengan mockups de mayor calidad.
- * ────────────────────────────────────────────────────────
- *
- * import { AnimatePresence } from "framer-motion";
- *
- * // Dentro del componente:
- * const [currentDevice, setCurrentDevice] = useState(0);
- * const devices = ['mobile', 'desktop'];
- *
- * useEffect(() => {
- *   const interval = setInterval(() => {
- *     setCurrentDevice(prev => (prev + 1) % devices.length);
- *   }, 4000);
- *   return () => clearInterval(interval);
- * }, []);
- *
- * // JSX del mockup:
- * <motion.div className="relative w-full h-full flex items-center justify-center min-h-[350px]">
- *   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
- *     <div className="w-[80%] h-[80%] bg-gradient-to-tr from-brand-500/20 to-accent-500/10 rounded-full blur-[80px] animate-glow-pulse" />
- *   </div>
- *   <AnimatePresence mode="wait">
- *     {currentDevice === 0 && (
- *       <motion.div key="mobile" ...>
- *         <img src="/mockups/panel-admin-mobile.jpg" alt="Panel móvil" />
- *       </motion.div>
- *     )}
- *     {currentDevice === 1 && (
- *       <motion.div key="desktop" ...>
- *         <img src="/mockups/panel-admin-pc.jpg" alt="Panel desktop" />
- *       </motion.div>
- *     )}
- *   </AnimatePresence>
- * </motion.div>
- */
